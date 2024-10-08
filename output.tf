@@ -1,12 +1,21 @@
-output "instance_details" {
-  value = {
-    MES_APP_SERVERS = [aws_instance.windows-server-app1.*.id,aws_instance.windows-server-db1.*.id,aws_instance.windows-server-lic.*.id]
-    # MES_instance_eips = [aws_eip.windows-eip.*.public_ip]
-    #MES_instance_name_app_servers = [aws_instance.windows-server-app1.*.tags.Name,aws_instance.windows-server-app2.*.tags.Name,aws_instance.windows-server-app3.*.tags.Name]
-    MES_vpc_cidr_block = aws_vpc.vpc.cidr_block
-    MES_public_subnets = [aws_subnet.public-subnet-1.id, aws_subnet.public-subnet-2.id]
-   
-  }
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = aws_vpc.main.id
+}
 
-  }
+output "public_subnet_1_id" {
+  description = "ID of the first public subnet"
+  value       = aws_subnet.public_subnet_1.id
+}
+
+output "public_subnet_2_id" {
+  description = "ID of the second public subnet"
+  value       = aws_subnet.public_subnet_2.id
+}
+
+output "security_group_id" {
+  description = "ID of the security group"
+  value       = aws_security_group.allow_http.id
+}
+
 
