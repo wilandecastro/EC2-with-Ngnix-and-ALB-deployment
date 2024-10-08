@@ -1,8 +1,3 @@
-################################
-## AWS Provider Module - Main ##
-################################
-
-# AWS Provider
 terraform {
   required_providers {
     aws = {
@@ -10,9 +5,9 @@ terraform {
       version = "~> 4.0"
     }
   }
+  required_version = ">= 1.0"
 }
 
 provider "aws" {
-  region     = var.aws_region
+  region = var.aws_region
 }
-
