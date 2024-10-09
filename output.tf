@@ -15,7 +15,7 @@ output "public_subnet_2_id" {
 
 output "security_group_id" {
   description = "ID of the security group"
-  value       = aws_security_group.allow_http.id
+  value       = aws_security_group.allow_http_ssh.id
 }
 output "instance_public_ip" {
   description = "Public IP address of the EC2 instance"
