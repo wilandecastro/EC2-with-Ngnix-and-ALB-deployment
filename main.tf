@@ -53,19 +53,9 @@ resource "aws_route_table" "public" {
   }
 }
 
-resource "aws_route_table_association" "public_1" {
-  subnet_id      = aws_subnet.public_subnet_1.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "public_2" {
-  subnet_id      = aws_subnet.public_subnet_2.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_security_group" "allow_http" {
-  name        = "allow_http"
-  description = "Allow HTTP inbound traffic"
+resource "aws_security_group" "allow_http_ssh" {
+  name        = "allow_http_ssh"
+  description = "Allow HTTP and SSH inbound traffic"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -76,6 +66,14 @@ resource "aws_security_group" "allow_http" {
     cidr_blocks = [aws_vpc.main.cidr_block]
   }
 
+  ingress {
+    description = "SSH from My IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["112.204.173.11"]  # Replace YOUR_IP_ADDRESS with your actual IP
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -84,28 +82,23 @@ resource "aws_security_group" "allow_http" {
   }
 
   tags = {
-    Name = "allow_http"
+    Name = "allow_http_ssh"
   }
 }
-data "aws_ami" "amazon_linux_2" {
-  most_recent = true
-  owners      = ["amazon"]
 
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
 
 resource "aws_instance" "example" {
   ami           = data.aws_ami.amazon_linux_2.id
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.public_subnet_1.id
 
-  vpc_security_group_ids = [aws_security_group.allow_http.id]
+  vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
+
+  key_name = "id_rsa"  # Make sure to replace this with your actual key pair name
 
   tags = {
     Name        = "${var.vpc_name}-example-instance"
     Environment = var.app_environment
   }
 }
+
