@@ -86,8 +86,12 @@ resource "aws_security_group" "allow_http_ssh" {
   }
 }
 
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  owners      = ["amazon"]
+}
 
-resource "aws_instance" "example" {
+resource "aws_instance" "amzn_linux2" {
   ami           = data.aws_ami.amazon_linux_2.id
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.public_subnet_1.id
