@@ -1,6 +1,7 @@
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = {
     Name        = var.vpc_name
@@ -12,6 +13,8 @@ resource "aws_subnet" "public_subnet_1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = var.public_subnet_cidr_1
   availability_zone = "${var.aws_region}a"
+  map_public_ip_on_launch = true 
+  
 
   tags = {
     Name        = "${var.vpc_name}-public-subnet-1"
@@ -39,6 +42,12 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
+resource "aws_route_table_association" "public-rt-association-1" {
+  subnet_id      = aws_subnet.public_subnet_1.id
+   route_table_id = aws_route_table.public.id
+
+}
+
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -58,6 +67,14 @@ resource "aws_security_group" "allow_http_ssh" {
   description = "Allow HTTP and SSH inbound traffic"
   vpc_id      = aws_vpc.main.id
 
+ingress {
+    description = "ICMP from anywhere"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]  # This allows ping from any IP. Adjust as needed for security.
+  }
+
   ingress {
     description = "HTTP from VPC"
     from_port   = 80
@@ -71,7 +88,7 @@ resource "aws_security_group" "allow_http_ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["112.204.173.11"]  # Replace YOUR_IP_ADDRESS with your actual IP
+    cidr_blocks = ["112.204.173.11/32"]  # using my actual IP
   }
 
   egress {
@@ -91,11 +108,11 @@ data "aws_ami" "amazon_linux_2" {
   owners      = ["amazon"]
 }
 
-resource "aws_instance" "amzn_linux2" {
+resource "aws_instance" "amazon_linux_2" {
   ami           = data.aws_ami.amazon_linux_2.id
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.public_subnet_1.id
-
+  associate_public_ip_address = true
   vpc_security_group_ids = [aws_security_group.allow_http_ssh.id]
 
   key_name = "id_rsa"  # Make sure to replace this with your actual key pair name
@@ -105,4 +122,6 @@ resource "aws_instance" "amzn_linux2" {
     Environment = var.app_environment
   }
 }
+
+
 

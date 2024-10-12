@@ -18,8 +18,8 @@ output "security_group_id" {
   value       = aws_security_group.allow_http_ssh.id
 }
 output "instance_public_ip" {
-  description = "Public IP address of the EC2 instance"
-  value       = aws_instance.amazon_linux_2.public_ip
+  value = aws_instance.amazon_linux_2.public_ip
 }
+
 
 
