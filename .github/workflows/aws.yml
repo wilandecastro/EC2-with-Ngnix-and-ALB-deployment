@@ -9,6 +9,7 @@ jobs:
   terraform:
     name: Apply Terraform
     runs-on: ubuntu-latest
+    environment: Development
 
     steps:
     - name: Checkout code
